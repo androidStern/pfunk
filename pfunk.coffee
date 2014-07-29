@@ -22,7 +22,7 @@ passesValidators = (args, checks)->
     passed = passed && checkValidations(checker_list, v)
   return passed
 
-SHORTHAND_TYPES = {
+REGISTERED_TYPES = {
   "String": _.isString
   "Function": _.isFunction
   "Object": _.isObject
@@ -36,8 +36,8 @@ pfunk = (base_fn, base_checks = {})->
     new_registered_checks = _.cloneDeep(base_checks)
     for v, i in validators
       do(v,i)->
-        if _.isString(v) and SHORTHAND_TYPES[v]?
-          v = SHORTHAND_TYPES[v]
+        if _.isString(v) and REGISTERED_TYPES[v]?
+          v = REGISTERED_TYPES[v]
         if new_registered_checks[i]?
           new_registered_checks[i].push v
         else
@@ -53,6 +53,6 @@ pfunk = (base_fn, base_checks = {})->
   return base_fn
 
 pfunk.registerType = (type_name, fn)->
-  SHORTHAND_TYPES[type_name] = fn
+  REGISTERED_TYPES[type_name] = fn
 
 module.exports = {pfunk}
