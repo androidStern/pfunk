@@ -80,7 +80,7 @@ Now we can use our new types to anotate any pfunk function.
 but first, lets take this opportunity showcase another nifty feature of pfunk...
 
 Imagine we want a function that concatenates two strings, but only if the
-first string is a `Long_Thing` and the second was a `Short_Thing`.
+first string is a `Long_Thing` and the second is a `Short_Thing`.
 We already have a function that joins strings, stringStringAdd, so we should try
 to reuse that if we can. What we want is to further specify the signature
 of stringStringAdd such that it not only restricts its arguments to strings, but
