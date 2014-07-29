@@ -1,19 +1,25 @@
 r = require 'ramda'
 _ = require 'lodash'
-every = r.all(r.identity)
+
+fTake = (n, list)->
+  nList = []
+  for i in [0...n]
+    nList.push list[i]
+  return nList
 
 checkValidations = (validations, value)->
-  every validations.map (v)-> v(value)
+  for fn in validations
+    if not fn(value) then return false
+  return true
 
 alwaysTrue = -> true
 
 passesValidators = (args, checks)->
   passed = true
-  for v,i in args
-    do(i)->
-      checker_list = checks[i]
-      checker_list ?= [alwaysTrue]
-      passed = passed && checkValidations(checker_list, v)
+  for v, i in args
+    checker_list = checks[i]
+    checker_list ?= [alwaysTrue]
+    passed = passed && checkValidations(checker_list, v)
   return passed
 
 SHORTHAND_TYPES = {
@@ -26,7 +32,7 @@ SHORTHAND_TYPES = {
 }
 
 pfunk = (base_fn, base_checks = {})->
-  withSignature = (validators...)->
+  base_fn.withSignature = (validators...)->
     new_registered_checks = _.cloneDeep(base_checks)
     for v, i in validators
       do(v,i)->
@@ -37,18 +43,16 @@ pfunk = (base_fn, base_checks = {})->
         else
           new_registered_checks[i] = [v]
     new_fn = r.arity base_fn.length, (args...)->
-      if args.length > 0 and passesValidators(args, new_registered_checks)
+      num_args_to_check = Math.max(base_fn.length, args.length)
+      args_to_check = fTake(num_args_to_check, args)
+      if args.length > 0 and passesValidators(args_to_check, new_registered_checks)
         base_fn.apply(null, args)
       else
         throw new Error("NOPE")
     return pfunk(new_fn, new_registered_checks)
-
-  base_fn.withSignature = withSignature
   return base_fn
 
-registerType = (type_name, fn)->
+pfunk.registerType = (type_name, fn)->
   SHORTHAND_TYPES[type_name] = fn
-
-pfunk.registerType = registerType
 
 module.exports = {pfunk}
