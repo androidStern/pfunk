@@ -17,7 +17,7 @@ $ cd pfunk && npm i
 
 add = (a,b)-> a + b
 
-pAdd = pfunk(add)
+pAdd = pfunk.strong(add)
 ```
 
 pAdd works just like you might expect:
@@ -86,7 +86,7 @@ pfunk.registerType("Short_Thing", shorterThan3)
 
 
 Now we can use our new types to anotate any pfunk function.
-but first, lets take this opportunity showcase another nifty feature of pfunk...
+but first, lets take this opportunity to showcase another nifty feature of pfunk...
 
 Imagine we want a function that concatenates two strings, but only if the
 first string is a `Long_Thing` and the second is a `Short_Thing`.
@@ -124,3 +124,26 @@ console.log longString_shortString_Add(LONG_ARRAY_THING, "a")
 `LONG_ARRAY_THING`'s length is `> 3` so it is indeed a `Long_Thing`, but since `longString_shortString_Add` is built on top of
 `stringStringAdd`, it `inherits` (excuse the OOP) `stringStringAdd`'s pre-condition that both arguments
 must be strings and thus it fails.
+
+## API
+
+### `pfunk.strong(fn)`
+
+>Wrap an ordinary function in a pfunk function. `.strong` specifies the failure
+mode. That is, if a function is called with a non matching signature in strong mode,
+it will throw an error.
+
+### `pfunk.loose(fn)`
+
+>Same as pfunk.strong except bad arguments cause the function to return undefined
+rather than throw an error.
+
+### `pfunk.registerType(type_name, predicate)`
+
+>Register a custom type annotation with pfunk.
+
+### `fn#withSignature(types, ...)`
+
+>Instance method. Returns a pfunk wrapped function with the specified signature.
+`types` can be any of "String", "Function", "Object", "Array", "Number", "*"(wildcard)
+or any custom type created with `pfunk.registerType`
